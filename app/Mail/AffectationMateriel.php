@@ -27,10 +27,10 @@ class AffectationMateriel extends Mailable
     public function envelope(): Envelope
     {
         // On définit qui est le bénéficiaire (Personne ou Salle)
-        $beneficiaire = $this->data['employe'] ?? $this->data['salle'] ?? 'Inconnu';
+        //$beneficiaire = $this->data['employe'] ?? $this->data['salle'] ?? 'Inconnu';
 
         return new Envelope(
-            subject: "Prêt Matériel : " . $this->data['materiel'] . " - " . $beneficiaire,
+           // subject: "Prêt Matériel : " . $this->data['materiel'] . " - " . $beneficiaire,
         );
     }
 
