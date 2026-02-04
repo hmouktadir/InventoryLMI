@@ -48,6 +48,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
        Route::get('/users', [UserController::class, 'index'])->name('users.index');
        Route::post('/users', [UserController::class, 'store'])->name('users.store');
        Route::patch('/users/{id}', [UserController::class, 'update'])->name('users.update');
+       Route::patch('/users/{id}/toggle', [App\Http\Controllers\UserController::class, 'toggleStatus'])->name('users.toggle');
+       Route::delete('/users/{id}', [App\Http\Controllers\UserController::class, 'destroy'])->name('users.destroy');
        
     });
     
