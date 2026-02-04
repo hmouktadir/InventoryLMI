@@ -1,174 +1,153 @@
 <x-app-layout>
     <style>
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+        /* Effet de brillance sur les cartes */
+        .premium-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
         }
-        .hover-float:hover { animation: float 3s ease-in-out infinite; }
         
-        /* Gradients Premium */
-        .bg-gradient-indigo { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); }
-        .bg-gradient-amber { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
-        .bg-gradient-blue { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
-        .bg-gradient-emerald { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        /* Animation subtile pour le point "Live" */
+        @keyframes pulse-indigo {
+            0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+        }
+        .animate-live { animation: pulse-indigo 2s infinite; }
 
-        /* Scrollbar Minimaliste */
-        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
-        
-        /* Effet Glassmorphism Global */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.4);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-        }
+        /* Style des barres de progression fines */
+        .progress-bar { height: 6px; border-radius: 10px; background: rgba(0,0,0,0.05); overflow: hidden; }
+        .progress-value { height: 100%; border-radius: 10px; transition: width 1.5s ease-in-out; }
     </style>
 
-    <div class="max-w-[1600px] mx-auto p-6 space-y-8">
+    <div class="max-w-[1600px] mx-auto p-8 space-y-10">
         
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+            <div>
+                <h1 class="text-4xl font-black text-slate-900 tracking-tight italic">
+                    Hello, <span class="text-indigo-600">{{ Auth::user()->name }}</span> 👋
+                </h1>
+                <p class="text-slate-500 font-bold mt-2">Voici l'état de ton parc informatique ce {{ now()->format('d F Y') }}</p>
+            </div>
             
-            <a href="{{ route('prets.index') }}" class="group relative glass-card p-7 rounded-[2.5rem] shadow-xl border border-white/60 overflow-hidden transition-all duration-500 hover:-translate-y-2">
-                <div class="absolute -top-10 -left-10 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-all"></div>
-                <div class="relative z-10">
-                    <div class="flex justify-between items-center mb-8">
-                        <div class="p-4 bg-gradient-indigo rounded-2xl shadow-lg shadow-indigo-200 hover-float text-white">
-                            <span class="text-2xl">🤝</span>
-                        </div>
-                        <div class="flex flex-col items-end">
-                            <span class="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Live Status</span>
-                            <div class="h-2 w-2 rounded-full bg-indigo-500 animate-pulse mt-1"></div>
-                        </div>
-                    </div>
-                    <div class="space-y-1">
-                        <h3 class="text-4xl font-black text-slate-800 tracking-tighter">{{ $pretsCount ?? 0 }}</h3>
-                        <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">Prêts en cours</p>
-                    </div>
-                </div>
-                <div class="absolute -right-6 -bottom-8 text-[10rem] opacity-[0.03] rotate-12 group-hover:rotate-0 transition-transform duration-700">🤝</div>
-            </a>
-
-            <a href="{{ route('stock.index') }}" class="group relative glass-card p-7 rounded-[2.5rem] shadow-xl border border-white/60 overflow-hidden transition-all duration-500 hover:-translate-y-2">
-                <div class="absolute -top-10 -left-10 w-32 h-32 bg-amber-500/10 rounded-full blur-3xl group-hover:bg-amber-500/20 transition-all"></div>
-                <div class="relative z-10">
-                    <div class="flex justify-between items-center mb-8">
-                        <div class="p-4 bg-gradient-amber rounded-2xl shadow-lg shadow-amber-200 hover-float text-white">
-                            <span class="text-2xl">⚠️</span>
-                        </div>
-                        <span class="text-[10px] font-black text-amber-600 uppercase tracking-widest">Attention</span>
-                    </div>
-                    <div class="space-y-1">
-                        <h3 class="text-4xl font-black text-slate-800 tracking-tighter">{{ $lowStockCount ?? 0 }}</h3>
-                        <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">Stock Critique</p>
-                    </div>
-                </div>
-                <div class="absolute -right-6 -bottom-8 text-[10rem] opacity-[0.03] rotate-12 group-hover:rotate-0 transition-transform duration-700">📦</div>
-            </a>
-
-            <a href="{{ route('salles.index') }}" class="group relative glass-card p-7 rounded-[2.5rem] shadow-xl border border-white/60 overflow-hidden transition-all duration-500 hover:-translate-y-2">
-                <div class="absolute -top-10 -left-10 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-all"></div>
-                <div class="relative z-10">
-                    <div class="flex justify-between items-center mb-8">
-                        <div class="p-4 bg-gradient-blue rounded-2xl shadow-lg shadow-blue-200 hover-float text-white">
-                            <span class="text-2xl">🏫</span>
-                        </div>
-                        <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">Sites</span>
-                    </div>
-                    <div class="space-y-1">
-                        <h3 class="text-4xl font-black text-slate-800 tracking-tighter">4</h3>
-                        <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">Établissements</p>
-                    </div>
-                </div>
-                <div class="absolute -right-6 -bottom-8 text-[10rem] opacity-[0.03] rotate-12 group-hover:rotate-0 transition-transform duration-700">🏫</div>
-            </a>
-
-            <div class="group relative glass-card p-7 rounded-[2.5rem] shadow-xl border border-white/60 overflow-hidden transition-all duration-500 hover:-translate-y-2">
-                <div class="absolute -top-10 -left-10 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl group-hover:bg-emerald-600/20 transition-all"></div>
-                <div class="relative z-10">
-                    <div class="flex justify-between items-center mb-8">
-                        <div class="p-4 bg-gradient-emerald rounded-2xl shadow-lg shadow-emerald-200 hover-float text-white">
-                            <span class="text-2xl">⚙️</span>
-                        </div>
-                        <span class="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Système</span>
-                    </div>
-                    <div class="space-y-1">
-                        <h3 class="text-4xl font-black text-slate-800 tracking-tighter">100%</h3>
-                        <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">Opérationnel</p>
-                    </div>
-                </div>
-                <div class="absolute -right-6 -bottom-8 text-[10rem] opacity-[0.03] rotate-12 group-hover:rotate-0 transition-transform duration-700">⚙️</div>
+            <div class="flex gap-3">
+                <a href="{{ route('prets.index') }}" class="flex items-center gap-3 bg-slate-900 text-white px-6 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-600 transition-all shadow-xl shadow-slate-200">
+                    <span>➕</span> Nouveau Prêt
+                </a>
+                <a href="{{ route('stock.index') }}" class="flex items-center gap-3 bg-white text-slate-900 px-6 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest border border-slate-200 hover:bg-slate-50 transition-all">
+                    📦 Gérer Stock
+                </a>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             
-            <div class="glass-card relative p-8 rounded-[3rem] border border-white/60 shadow-2xl overflow-hidden group">
-                <div class="absolute -right-20 -top-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px] group-hover:bg-indigo-500/20 transition-all duration-700"></div>
-                <h3 class="text-xl font-black text-slate-800 mb-10 flex items-center gap-3 font-italic">
-                    <span class="flex h-10 w-10 items-center justify-center bg-white rounded-xl shadow-sm">📍</span>
-                    Répartition par Site
-                </h3>
-                <div class="relative h-72">
-                    <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                        <span class="text-5xl font-black text-slate-800 tracking-tighter">{{ array_sum($dataGraph) }}</span>
-                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Objets</span>
-                    </div>
-                    <canvas id="siteChart"></canvas>
+            <div class="premium-card p-8 rounded-[2.5rem] group hover:scale-[1.02] transition-transform">
+                <div class="flex justify-between items-start mb-6">
+                    <div class="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-indigo-200">🤝</div>
+                    <span class="animate-live h-3 w-3 rounded-full bg-indigo-500 border-2 border-white"></span>
                 </div>
-                <div class="mt-10 grid grid-cols-2 gap-4">
-                    @foreach(['Lycée', 'Collège', 'B1', 'B2'] as $index => $siteName)
-                    <div class="flex items-center justify-between p-3 rounded-2xl bg-white/50 border border-transparent hover:border-white hover:shadow-sm transition-all">
-                        <div class="flex items-center gap-3">
-                            <span class="w-3 h-3 rounded-full {{ ['bg-indigo-500', 'bg-blue-400', 'bg-rose-400', 'bg-emerald-400'][$index] }}"></span>
-                            <span class="text-[11px] font-bold text-slate-600 uppercase">{{ $siteName }}</span>
-                        </div>
-                        <span class="text-xs font-black text-slate-400">{{ $dataGraph[$index] }}</span>
-                    </div>
+                <div class="text-5xl font-black text-slate-900 tracking-tighter">{{ $pretsCount ?? 0 }}</div>
+                <div class="text-[11px] font-black text-slate-400 uppercase tracking-widest mt-2">Prêts Actifs</div>
+                <div class="mt-6 flex items-center gap-2 text-[10px] font-bold text-indigo-500 bg-indigo-50 px-3 py-1.5 rounded-xl w-fit">
+                    📈 +12% cette semaine
+                </div>
+            </div>
+
+            <div class="premium-card p-8 rounded-[2.5rem] group hover:scale-[1.02] transition-transform border-rose-100">
+                <div class="flex justify-between items-start mb-6">
+                    <div class="w-14 h-14 bg-rose-500 rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-rose-200">⚠️</div>
+                    <span class="text-rose-500 text-[10px] font-black uppercase">Urgent</span>
+                </div>
+                <div class="text-5xl font-black text-rose-600 tracking-tighter">{{ $lowStockCount ?? 0 }}</div>
+                <div class="text-[11px] font-black text-slate-400 uppercase tracking-widest mt-2">Articles critiques</div>
+                <div class="mt-6 progress-bar">
+                    <div class="progress-value bg-rose-500" style="width: {{ ($lowStockCount > 0) ? '85%' : '0%' }}"></div>
+                </div>
+            </div>
+
+            <div class="premium-card p-8 rounded-[2.5rem] group hover:scale-[1.02] transition-transform">
+                <div class="flex justify-between items-start mb-6">
+                    <div class="w-14 h-14 bg-slate-900 rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-slate-300">👥</div>
+                </div>
+                <div class="text-5xl font-black text-slate-900 tracking-tighter">{{ \App\Models\User::count() }}</div>
+                <div class="text-[11px] font-black text-slate-400 uppercase tracking-widest mt-2">Staff IT</div>
+                <div class="mt-6 flex -space-x-3">
+                    @foreach(\App\Models\User::take(4)->get() as $u)
+                        <div class="h-8 w-8 rounded-full border-2 border-white bg-slate-200 flex items-center justify-center text-[10px] font-bold">{{ substr($u->name,0,1) }}</div>
                     @endforeach
                 </div>
             </div>
 
-            <div class="glass-card relative p-8 rounded-[3rem] border border-white/60 shadow-2xl overflow-hidden {{ $lowStockCount > 0 ? 'bg-red-50/50' : '' }}">
-                @if($lowStockCount > 0)
-                    <div class="absolute -right-10 -top-10 w-40 h-40 bg-red-500/20 rounded-full blur-[50px] animate-pulse"></div>
-                @endif
-                <div class="relative z-10">
-                    <div class="flex justify-between items-start mb-6">
-                        <div class="p-4 {{ $lowStockCount > 0 ? 'bg-red-500' : 'bg-emerald-500' }} rounded-2xl shadow-lg text-white">
-                            {!! $lowStockCount > 0 ? '⚠️' : '✅' !!}
+            <div class="premium-card p-8 rounded-[2.5rem] group hover:scale-[1.02] transition-transform">
+                <div class="flex justify-between items-start mb-6">
+                    <div class="w-14 h-14 bg-emerald-500 rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-emerald-200">🏫</div>
+                </div>
+                <div class="text-5xl font-black text-slate-900 tracking-tighter">4</div>
+                <div class="text-[11px] font-black text-slate-400 uppercase tracking-widest mt-2">Sites Connectés</div>
+                <div class="mt-6 text-[10px] font-bold text-emerald-600">Lycée / Collège / B1 / B2</div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <div class="lg:col-span-2 premium-card p-10 rounded-[3.5rem]">
+                <div class="flex justify-between items-center mb-10">
+                    <h3 class="text-2xl font-black text-slate-900 tracking-tight">Répartition Géo-Informatique</h3>
+                    <div class="flex gap-2">
+                         <span class="px-3 py-1 bg-slate-100 rounded-lg text-[10px] font-black uppercase">Filtre: Global</span>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 items-center gap-10">
+                    <div class="relative h-72">
+                        <canvas id="siteChart"></canvas>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                            <span class="text-4xl font-black text-slate-900">{{ array_sum($dataGraph) }}</span>
+                            <span class="text-[10px] font-black text-slate-400 uppercase">Total</span>
                         </div>
-                        <span class="text-[10px] font-black {{ $lowStockCount > 0 ? 'text-red-600' : 'text-emerald-600' }} uppercase tracking-widest">
-                            {{ $lowStockCount > 0 ? 'Réapprovisionnement requis' : 'Inventaire Optimal' }}
-                        </span>
                     </div>
-                    <div class="mb-8">
-                        <h3 class="text-5xl font-black text-slate-800 tracking-tighter">{{ $lowStockCount }}</h3>
-                        <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Articles en zone rouge</p>
-                    </div>
-                    <div class="space-y-3 max-h-[250px] overflow-y-auto pr-2 custom-scrollbar">
-                        @forelse($articlesCritiques as $article)
-                            <div class="flex items-center justify-between p-4 bg-white/60 rounded-2xl border border-red-100 hover:border-red-300 transition-all">
-                                <div>
-                                    <span class="text-sm font-black text-slate-700 block">{{ $article->designation }}</span>
-                                </div>
-                                <div class="flex flex-col items-end gap-1">
-                                    <span class="text-sm font-black text-red-600">{{ $article->quantite }} restants</span>
-                                    <div class="w-16 bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                                        <div class="bg-red-500 h-full" style="width: {{ min(($article->quantite / 10) * 100, 100) }}%"></div>
-                                    </div>
-                                </div>
+                    <div class="space-y-4">
+                        @foreach(['Lycée', 'Collège', 'B1', 'B2'] as $idx => $site)
+                        <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-transparent hover:border-indigo-100 hover:bg-white transition-all">
+                            <div class="flex items-center gap-3">
+                                <span class="w-3 h-3 rounded-full {{ ['bg-indigo-500', 'bg-blue-400', 'bg-rose-400', 'bg-emerald-400'][$idx] }}"></span>
+                                <span class="text-xs font-black text-slate-700 uppercase">{{ $site }}</span>
                             </div>
-                        @empty
-                            <div class="text-center py-10">
-                                <span class="text-4xl block mb-2">🎉</span>
-                                <p class="text-[10px] font-bold text-emerald-600 uppercase">Tout est en ordre !</p>
-                            </div>
-                        @endforelse
+                            <span class="text-sm font-black text-slate-900">{{ $dataGraph[$idx] }}</span>
+                        </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
 
+            <div class="premium-card p-10 rounded-[3.5rem]">
+                <h3 class="text-2xl font-black text-slate-900 tracking-tight mb-8">Alertes Stock</h3>
+                <div class="space-y-4 max-h-[480px] overflow-y-auto pr-2 custom-scrollbar">
+                    @forelse($articlesCritiques as $art)
+                    <div class="p-5 bg-white/50 rounded-3xl border border-rose-50 group hover:border-rose-200 transition-all">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="font-black text-slate-800 text-sm tracking-tight">{{ $art->designation }}</div>
+                            <span class="text-[10px] font-black text-rose-500 bg-rose-50 px-2 py-1 rounded-lg">Rupture</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="text-[10px] font-bold text-slate-400 uppercase">Quantité restante</div>
+                            <div class="text-lg font-black text-rose-600">{{ $art->quantite }}</div>
+                        </div>
+                        <div class="mt-3 progress-bar">
+                            <div class="progress-value bg-rose-500" style="width: {{ ($art->quantite / 10) * 100 }}%"></div>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="text-center py-20">
+                        <div class="text-4xl mb-4">✨</div>
+                        <p class="text-xs font-black text-emerald-500 uppercase">Tout est parfait !</p>
+                    </div>
+                    @endforelse
+                </div>
+            </div>
         </div>
     </div>
 
@@ -176,47 +155,24 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const ctx = document.getElementById('siteChart').getContext('2d');
-            
-            // Gradients pour le Donut
-            const createGrad = (color1, color2) => {
-                const g = ctx.createLinearGradient(0, 0, 0, 400);
-                g.addColorStop(0, color1); g.addColorStop(1, color2);
-                return g;
-            };
-
             new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     labels: ['Lycée', 'Collège', 'B1', 'B2'],
                     datasets: [{
                         data: @json($dataGraph),
-                        backgroundColor: [
-                            createGrad('#6366f1', '#a855f7'),
-                            createGrad('#3b82f6', '#2dd4bf'),
-                            createGrad('#fb7185', '#e11d48'),
-                            createGrad('#34d399', '#059669')
-                        ],
+                        backgroundColor: ['#6366f1', '#60a5fa', '#fb7185', '#34d399'],
                         borderWidth: 0,
                         borderRadius: 20,
-                        spacing: 8,
-                        cutout: '82%',
+                        spacing: 10,
+                        cutout: '85%'
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: '#1e293b',
-                            padding: 15,
-                            cornerRadius: 12,
-                            callbacks: {
-                                label: (context) => ` ${context.raw} équipements`
-                            }
-                        }
-                    },
-                    animation: { animateScale: true, duration: 2000, easing: 'easeOutQuart' }
+                    plugins: { legend: { display: false } },
+                    animation: { animateScale: true, duration: 2000 }
                 }
             });
         });
