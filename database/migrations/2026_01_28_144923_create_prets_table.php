@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('prets', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('stock_id')->constrained('stocks');
             $table->string('employe');
             $table->string('accessoire');
             $table->timestamp('date_pret')->useCurrent();

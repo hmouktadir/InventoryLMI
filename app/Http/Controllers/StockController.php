@@ -31,31 +31,39 @@ class StockController extends Controller
     // Optionnel : Pour mettre à jour rapidement la quantité
     public function update(Request $request, $id)
     {
-            // 1. On récupère l'article avant modification
+        // 1. On récupère l'article
         $stock = \App\Models\Stock::findOrFail($id);
         $ancienneQuantite = $stock->quantite;
 
-        // 2. Validation
+        // 2. Validation (on accepte les nombres négatifs pour les retraits)
         $request->validate([
-            'quantite' => 'required|integer|min:0',
+            'quantite' => 'required|integer', // On enlève min:0 pour permettre les -5, -10
         ]);
 
-        // 3. Mise à jour
+        $ajustement = (int)$request->quantite;
+        $nouvelleQuantite = $ancienneQuantite + $ajustement;
+
+        // Sécurité : Empêcher un stock négatif
+        if ($nouvelleQuantite < 0) {
+            return back()->with('error', 'Action impossible : le stock tomberait à ' . $nouvelleQuantite);
+        }
+
+        // 3. Mise à jour réelle
         $stock->update([
-            'quantite' => $request->quantite
+            'quantite' => $nouvelleQuantite
         ]);
 
-        // 4. Historique
+        // 4. Historique détaillé
         StockHistory::create([
             'stock_id' => $stock->id,
             'designation' => $stock->designation,
             'ancienne_quantite' => $ancienneQuantite,
-            'nouvelle_quantite' => $request->quantite,
-            'type_mouvement' => 'Mise à jour manuelle',
+            'nouvelle_quantite' => $nouvelleQuantite,
+            'type_mouvement' => $ajustement > 0 ? 'Réapprovisionnement (+)' : 'Retrait (-)',
             'technicien' => auth()->user()->name,
         ]);
 
-        return back()->with('success', 'Stock mis à jour avec succès !');
+        return back()->with('success', "Mouvement de $ajustement unité(s) enregistré !");
     }
 
     public function destroy($id)

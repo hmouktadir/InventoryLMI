@@ -17,6 +17,7 @@ class DashboardController extends Controller
 
         // 2. Compter les articles en stock critique (ex: moins de 3 unités)
         // Si tu n'as pas encore de table stock, tu peux mettre 0 pour l'instant
+        
         $lowStockCount = Stock::where('quantite', '<=', 3)->count();
 
         // Récupère le nombre de prêts par site

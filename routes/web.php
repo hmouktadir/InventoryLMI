@@ -28,6 +28,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/historique', [PretController::class, 'historique'])->name('prets.historique');
     Route::delete('/prets/{id}', [PretController::class, 'destroy'])->name('prets.destroy');
     Route::patch('/prets/{id}', [PretController::class, 'update'])->name('prets.update');
+    Route::get('/prets/{id}/pdf', [PretController::class, 'genererPDF'])->name('prets.pdf');
 
     //modification de profile 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
