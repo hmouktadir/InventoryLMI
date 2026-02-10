@@ -10,7 +10,9 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class SalleController extends Controller {
     public function index() {
+
         $equipements = \App\Models\SalleEquipement::orderBy('nom_salle')->get();
+
         // On récupère uniquement les articles qui ont du stock
         $articlesDisponibles = \App\Models\Stock::where('quantite', '>', 0)->get();
         
@@ -22,7 +24,7 @@ class SalleController extends Controller {
             // 1. Validation stricte
         $request->validate([
             'nom_salle' => 'required|string|max:255',
-            'site'      => 'required|string', // Ajout du site
+            'site'      => 'required|string',
             'materiel'  => 'required|string',
             'etat'      => 'required|string',
         ]);
@@ -40,7 +42,7 @@ class SalleController extends Controller {
                 // 3. Création de l'affectation
                 \App\Models\SalleEquipement::create([
                     'nom_salle'  => $request->nom_salle,
-                    'site'       => $request->site, // Ajouté
+                    'site'       => $request->site,
                     'materiel'   => $request->materiel,
                     'etat'       => $request->etat,
                     'technicien' => auth()->user()->name,

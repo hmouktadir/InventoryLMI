@@ -29,7 +29,7 @@ class UserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => $request->role, // Assure-toi que cette ligne existe !
+            'role' => $request->role,
             'is_active' => true,
         ]);
 

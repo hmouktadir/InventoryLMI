@@ -28,7 +28,6 @@ class StockController extends Controller
         return back()->with('success', 'Article ajouté au stock avec succès !');
     }
 
-    // Optionnel : Pour mettre à jour rapidement la quantité
     public function update(Request $request, $id)
     {
         // 1. On récupère l'article

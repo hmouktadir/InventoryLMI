@@ -15,7 +15,7 @@ class StockHistory extends Model
         'technicien',
     ];
 
-    // Petit bonus : La relation pour retrouver l'article parent facilement
+    // La relation pour retrouver l'article parent facilement
     public function stock()
     {
         return $this->belongsTo(Stock::class);

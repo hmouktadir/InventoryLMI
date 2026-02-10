@@ -46,8 +46,6 @@ class PretController extends Controller
             'stock_id' => 'required|exists:stocks,id', // On valide l'ID du stock sélectionné
             'numero_serie' => 'nullable',
         ]);
-        // c'est ici que le problème se pose, on doit vérifier la quantité avant de créer le prêt
-        
 
         // 1. On récupère l'article en stock
         $stock = \App\Models\Stock::find($request->stock_id);
@@ -62,7 +60,7 @@ class PretController extends Controller
             'employe' => $request->employe,
             'site' => $request->site,
             'stock_id' => $stock->id, // Liaison ID
-            'accessoire' => $stock->designation, // On garde le nom pour l'historique
+            'accessoire' => $stock->designation,
             'numero_serie' => $request->numero_serie,
             'technicien' => auth()->user()->name,
             'date_affectation' => now(),
@@ -71,7 +69,7 @@ class PretController extends Controller
         // 4. Déduction automatique du Stock
         $stock->decrement('quantite', 1); // Retire 1 du stock
 
-        // 5. Log d'Audit (Optionnel mais recommandé)
+        // 5. Log d'Audit
         \App\Models\ActivityLog::create([
             'admin_id' => auth()->id(),
             'action' => 'Prêt matériel',
@@ -101,8 +99,6 @@ class PretController extends Controller
             // 3. On marque le prêt comme rendu
             $pret->update([
                 'est_rendu' => true,
-                // Optionnel : on peut enregistrer la date réelle du retour
-                // 'date_retour' => now(), 
             ]);
 
             // 4. Log d'Audit pour l'historique
@@ -123,7 +119,7 @@ class PretController extends Controller
     public function historique() {
         $historique = Pret::where('est_rendu', true)
                                   ->orderBy('updated_at', 'desc')
-                                  ->paginate(15); // Utilise la pagination si tu as beaucoup de données
+                                  ->paginate(20);
 
         return view('historique', compact('historique'));
     }
@@ -147,7 +143,6 @@ class PretController extends Controller
     {
         $pret = Pret::with('stock')->findOrFail($id);
 
-        // On prépare le PDF avec les options pour forcer une seule page
         $pdf = Pdf::loadView('pdf.decharge', compact('pret'));
         
         $pdf->setPaper('a4', 'portrait');
@@ -160,7 +155,7 @@ class PretController extends Controller
             'margin_right' => 0,
         ]);
 
-        // .stream() ouvre dans le navigateur au lieu de télécharger
+        // .stream() ouvre dans le navigateur
         return $pdf->stream("Bon_Decharge_{$pret->employe}.pdf");
     }
     

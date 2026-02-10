@@ -9,7 +9,7 @@
             margin: 0; padding: 0; 
             width: 210mm; height: 297mm;
             color: #1e293b;
-            background: #f8fafc; /* Fond très légèrement gris pour faire ressortir les cadres */
+            background: #f8fafc; 
         }
 
         .page-wrapper {
@@ -24,14 +24,12 @@
             position: absolute;
             width: 180mm; 
             height: 125mm; 
-            left: 5mm; /* Centrage parfait (210 - 180) / 2 */
+            left: 5mm; 
             border: 1px solid #e2e8f0;
             background: #ffffff;
             border-radius: 20px;
             padding: 10mm;
             box-sizing: border-box;
-            /* Simulation d'ombre par une double bordure ou trait épais en bas */
-            border-bottom: 4px solid #b60000; 
         }
 
         .top-coupon { top: 5mm; }
@@ -40,7 +38,7 @@
         /* Ligne de découpe */
         .cut-line {
             position: absolute;
-            top: 148.5mm;
+            top: 155mm;
             width: 100%;
             border-top: 2px dashed #cbd5e1;
             text-align: center;
@@ -174,7 +172,7 @@
     </div>
 
     <div class="cut-line">
-        <span>✂ DOCUMENT À DÉCOUPER ✂</span>
+        <span>DOCUMENT À DÉCOUPER</span>
     </div>
 
     <div class="coupon-border bottom-coupon">

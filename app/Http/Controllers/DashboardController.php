@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Pret; // <--- AJOUTE CETTE LIGNE
-use App\Models\Stock; // Si tu as un modèle Stock, ajoute-le aussi
+use App\Models\Pret;
+use App\Models\Stock;
 
 
 
@@ -15,8 +15,7 @@ class DashboardController extends Controller
         // 1. Compter les prêts actifs
         $pretsCount = Pret::where('est_rendu', '0')->count();
 
-        // 2. Compter les articles en stock critique (ex: moins de 3 unités)
-        // Si tu n'as pas encore de table stock, tu peux mettre 0 pour l'instant
+        // 2. Compter les articles en stock critique
         
         $lowStockCount = Stock::where('quantite', '<=', 3)->count();
 
